@@ -10,7 +10,7 @@ function get_hostname(url){
     return tmp.hostname
 }
 
-// listen for any changes to the URL of any tab.
+// listen for any changes to the URL of any tab
 chrome.tabs.onUpdated.addListener(function(id, info, tab){
 
     if (info.status !== "complete"){
