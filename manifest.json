@@ -12,6 +12,8 @@
     ],
     "background": {
         "scripts": [
+            "libs/psl.js",
+            "data/top-sites.js",
             "bootstrap.js"
         ],
         "persistent": false

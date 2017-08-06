@@ -19,6 +19,19 @@ chrome.tabs.onUpdated.addListener(function(id, info, tab){
 
     var url = tab.url.toLowerCase()
     var hostname = get_hostname(url)
+    var domain = psl.parse(hostname).domain
+
+    if (domain){
+        console.log("checking top sites list for " + domain)
+
+        var rank = window.top_sites.indexOf(domain)
+        if (rank !== -1){
+            console.log("top site #"+(rank+1))
+        } else {
+            console.log("not a top site")
+        }
+    }
+
 
     console.log("checking browsing history for " + hostname)
 
