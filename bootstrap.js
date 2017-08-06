@@ -4,10 +4,8 @@ chrome.runtime.onInstalled.addListener(function(details) {
 });
 
 function get_hostname(url){
-    // use the browser to parse a URL string into just the hostname
-    var tmp = document.createElement("a");
-    tmp.href = url;
-    return tmp.hostname
+    var u = new URL(url)
+    return u.hostname
 }
 
 function get_domain_rank(domain){
