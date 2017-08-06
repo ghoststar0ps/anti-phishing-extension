@@ -53,9 +53,9 @@ function get_history_summary(hostname, rank, cb){
 }
 
 function calc_badge_ui(rank, history_summary){
-    if ((typeof rank == "number" && rank < 1000) || history_summary.total_visits > 3){
+    if ((typeof rank == "number" && rank < 1000) || history_summary.total_visits > 12){
         return {text:"safe", color: "green"};
-    } else if ((typeof rank == "number" && rank < 10000) || history_summary.total_visits > 1){
+    } else if ((typeof rank == "number" && rank < 10000) || history_summary.total_visits > 5){
         return {text:"wary", color: "orange"};
     } else {
         return {text:"risky", color: "red"};
