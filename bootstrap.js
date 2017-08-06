@@ -3,6 +3,13 @@ chrome.runtime.onInstalled.addListener(function(details) {
     console.log("just installed")
 });
 
+function get_hostname(url){
+    // use the browser to parse a URL string into just the hostname
+    var tmp = document.createElement("a");
+    tmp.href = url;
+    return tmp.hostname
+}
+
 // listen for any changes to the URL of any tab.
 chrome.tabs.onUpdated.addListener(function(id, info, tab){
 
@@ -11,11 +18,7 @@ chrome.tabs.onUpdated.addListener(function(id, info, tab){
     }
 
     var url = tab.url.toLowerCase()
-
-    // use browser to parse hostname
-    var tmp = document.createElement("a");
-    tmp.href = url;
-    hostname = tmp.hostname
+    var hostname = get_hostname(url)
 
     console.log("checking browsing history for " + hostname)
 
@@ -28,6 +31,10 @@ chrome.tabs.onUpdated.addListener(function(id, info, tab){
 
         for (var i=0; i<history.length; i++){
             var h = history[i]
+
+            if (get_hostname(h.url) != hostname){
+                continue;  // skip history items from other domains
+            }
 
             history_summary.total_visits += h.visitCount
             if (h.lastVisitTime < history_summary.earliest_visit){
