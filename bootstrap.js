@@ -10,29 +10,21 @@ function get_hostname(url){
     return tmp.hostname
 }
 
-// listen for any changes to the URL of any tab
-chrome.tabs.onUpdated.addListener(function(id, info, tab){
+function get_domain_rank(domain){
+    console.log("checking top sites list for " + domain)
 
-    if (info.status !== "complete"){
-        return;
+    var rank = window.top_sites.indexOf(domain)
+    if (rank !== -1){
+        rank = rank + 1
+        console.log("top site #"+(rank))
+        return rank
+    } else {
+        console.log("not a top site")
+        return null
     }
+}
 
-    var url = tab.url.toLowerCase()
-    var hostname = get_hostname(url)
-    var domain = psl.parse(hostname).domain
-
-    if (domain){
-        console.log("checking top sites list for " + domain)
-
-        var rank = window.top_sites.indexOf(domain)
-        if (rank !== -1){
-            console.log("top site #"+(rank+1))
-        } else {
-            console.log("not a top site")
-        }
-    }
-
-
+function get_history_summary(hostname, rank, cb){
     console.log("checking browsing history for " + hostname)
 
     chrome.history.search({text: hostname}, function(history){
@@ -56,6 +48,49 @@ chrome.tabs.onUpdated.addListener(function(id, info, tab){
         }
 
         console.log(history_summary)
+        cb(history_summary, rank)
     })
+}
+
+function calc_badge_ui(rank, history_summary){
+    if ((typeof rank == "number" && rank < 1000) || history_summary.total_visits > 3){
+        return {text:"safe", color: "green"};
+    } else if ((typeof rank == "number" && rank < 10000) || history_summary.total_visits > 1){
+        return {text:"wary", color: "orange"};
+    } else {
+        return {text:"risky", color: "red"};
+    }
+}
+
+
+// listen for any changes to the URL of any tab
+chrome.tabs.onUpdated.addListener(function(id, info, tab){
+
+    if (info.status !== "complete"){
+        return;
+    }
+
+    // url information for this page
+    var url = tab.url.toLowerCase()
+    var hostname = get_hostname(url)
+    var domain = psl.parse(hostname).domain
+
+    // get stats about this page
+    rank = get_domain_rank(domain)
+    get_history_summary(hostname, rank, function(history_summary){
+        ui = calc_badge_ui(rank, history_summary)
+        console.log(ui)
+
+        chrome.browserAction.setBadgeText({
+            text: ui["text"],
+            tabId: tab.id
+        })
+
+        chrome.browserAction.setBadgeBackgroundColor({
+            color: ui["color"],
+            tabId: tab.id
+        })
+    })
+
 
 });
